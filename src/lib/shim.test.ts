@@ -18,7 +18,7 @@ describe('shim', () => {
       expect(html).toContain('https://t.me/TestBot?start=abc123');
       expect(html).toContain('tg://resolve?domain=TestBot');
       expect(html).toContain('start=abc123');
-      expect(html).toContain('Continue to Telegram');
+      expect(html).toContain('Open in Telegram App');
     });
 
     it('should generate HTML for public channel', () => {

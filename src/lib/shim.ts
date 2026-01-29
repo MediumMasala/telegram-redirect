@@ -72,7 +72,7 @@ export function generateShimHtml(options: ShimOptions): string {
     startParam,
     title = 'Open Telegram to chat with Tal',
     description = 'Tap the button below to start a conversation',
-    fallbackDelay = 800,
+    fallbackDelay = 1500,
   } = options;
 
   const deepLink = buildDeepLink(type, destination, startParam);
@@ -153,6 +153,14 @@ export function generateShimHtml(options: ShimOptions): string {
     .fallback-instructions ol { margin-left: 18px; }
     .fallback-instructions li { margin-bottom: 6px; }
     .ref-tag { color: #aaa; font-size: 10px; margin-top: 16px; }
+    .direct-link {
+      display: block;
+      margin-top: 16px;
+      color: #0088cc;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .direct-link:hover { text-decoration: underline; }
     @media (max-width: 380px) {
       .container { padding: 24px 16px; }
       h1 { font-size: 20px; }
@@ -168,17 +176,19 @@ export function generateShimHtml(options: ShimOptions): string {
     </svg>
     <h1>${safeTitle}</h1>
     <p class="subtitle">${safeDescription}</p>
-    <button id="cta" class="cta-button">Continue to Telegram</button>
+    <button id="cta" class="cta-button">Open in Telegram App</button>
+    <a href="${safeFallbackUrl}" class="direct-link" target="_blank" rel="noopener">Or open in browser →</a>
     <div class="fallback">
       <a id="fallbackToggle" class="fallback-link">Having trouble? Tap here for help</a>
       <div id="fallbackInstructions" class="fallback-instructions">
         <p><strong>If Telegram doesn't open:</strong></p>
         <ol>
-          <li>Tap the <strong>•••</strong> menu in the top right corner</li>
+          <li>Make sure you have Telegram installed</li>
+          <li>If you're in LinkedIn/Twitter app, tap <strong>⋮</strong> or <strong>•••</strong> menu</li>
           <li>Select "<strong>Open in browser</strong>" or "<strong>Open in Safari/Chrome</strong>"</li>
-          <li>Then tap "Continue to Telegram" again</li>
+          <li>Then tap "Open in Telegram App" again</li>
         </ol>
-        <p style="margin-top: 10px;">Or <a href="${safeFallbackUrl}" target="_blank" rel="noopener" style="color: #0088cc;">open Telegram directly</a></p>
+        <p style="margin-top: 10px;">Or <a href="${safeFallbackUrl}" target="_blank" rel="noopener" style="color: #0088cc;">click here to open in web</a></p>
       </div>
     </div>
     ${safeCode ? `<div class="ref-tag">ref: ${safeCode.slice(0, 12)}...</div>` : ''}
@@ -192,11 +202,19 @@ export function generateShimHtml(options: ShimOptions): string {
       var fallbackToggle = document.getElementById('fallbackToggle');
       var fallbackInstructions = document.getElementById('fallbackInstructions');
 
+      // Only redirect when user clicks the button
       ctaBtn.addEventListener('click', function(e) {
         e.preventDefault();
+
+        // Try deep link first
         window.location.href = tgDeepLink;
+
+        // Fallback to https after delay if deep link didn't work
         setTimeout(function() {
-          window.location.href = tgHttps;
+          // Check if page is still visible (deep link didn't work)
+          if (!document.hidden) {
+            window.location.href = tgHttps;
+          }
         }, fallbackDelay);
       });
 
@@ -204,17 +222,6 @@ export function generateShimHtml(options: ShimOptions): string {
         e.preventDefault();
         fallbackInstructions.classList.toggle('show');
       });
-
-      // Auto-trigger on page load for mobile
-      var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile) {
-        setTimeout(function() {
-          window.location.href = tgDeepLink;
-          setTimeout(function() {
-            window.location.href = tgHttps;
-          }, fallbackDelay);
-        }, 300);
-      }
     })();
   </script>
 </body>
