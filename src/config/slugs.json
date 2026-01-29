@@ -6,7 +6,7 @@
       "mode": "shim",
       "destination": "TalCareerBot",
       "description": "Open Telegram to chat with Tal",
-      "defaultStartParam": "hi_tal_count_me_in",
+      "defaultStartParam": "Hytale_County",
       "active": true
     },
     {
@@ -15,7 +15,7 @@
       "mode": "302",
       "destination": "TalCareerBot",
       "description": "Tal Career Bot - Direct redirect",
-      "defaultStartParam": "hi_tal_count_me_in",
+      "defaultStartParam": "Hytale_County",
       "active": true
     },
     {
@@ -24,7 +24,7 @@
       "mode": "shim",
       "destination": "TalCareerBot",
       "description": "Open Telegram to chat with Tal",
-      "defaultStartParam": "hi_tal_count_me_in",
+      "defaultStartParam": "Hytale_County",
       "active": true
     },
     {
@@ -33,7 +33,7 @@
       "mode": "302",
       "destination": "TalCareerBot",
       "description": "Tal Career Bot - Direct",
-      "defaultStartParam": "hi_tal_count_me_in",
+      "defaultStartParam": "Hytale_County",
       "active": true
     },
     {
