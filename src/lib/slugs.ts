@@ -98,6 +98,7 @@ function validateSlugConfig(slug: unknown, index: number): SlugConfig {
     mode: s.mode as SlugConfig['mode'],
     destination: s.destination,
     description: typeof s.description === 'string' ? s.description : undefined,
+    defaultStartParam: typeof s.defaultStartParam === 'string' ? s.defaultStartParam : undefined,
     active: s.active !== false, // Default to true if not specified
   };
 }

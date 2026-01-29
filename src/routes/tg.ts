@@ -9,7 +9,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { getSlugConfig } from '../lib/slugs.js';
 import { generateCode } from '../lib/code.js';
 import { generateShimHtml, getDirectRedirectUrl } from '../lib/shim.js';
-import { parseUserAgent, isBot } from '../lib/ua.js';
+import { parseUserAgent, isBot, detectPlatform } from '../lib/ua.js';
 import {
   generateRequestId,
   hashIp,
@@ -155,6 +155,9 @@ export async function tgRoutes(
       // Continue anyway
     }
 
+    // Detect platform for redirect logic
+    const platform = detectPlatform(userAgent);
+
     request.log.info(
       {
         slug,
@@ -162,17 +165,22 @@ export async function tgRoutes(
         mode: slugConfig.mode,
         type: slugConfig.type,
         device: device.type,
+        platform,
         hasCode: !!code,
       },
       'Processing redirect'
     );
 
-    // Return response based on mode
-    if (slugConfig.mode === '302') {
-      // Direct redirect
+    // Platform-based redirect logic (like branchhq):
+    // - iOS: Direct 302 redirect (deep links work well)
+    // - Desktop: Direct 302 redirect
+    // - Android: Show shim page (in-app browsers need extra step)
+
+    if (slugConfig.mode === '302' || platform === 'ios' || platform === 'desktop') {
+      // Direct redirect for iOS, Desktop, or explicit 302 mode
       return reply.redirect(302, redirectTarget);
     } else {
-      // Shim page
+      // Android: Show shim page with animation
       const html = generateShimHtml({
         type: slugConfig.type,
         destination: slugConfig.destination,

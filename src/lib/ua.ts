@@ -120,3 +120,41 @@ export function isBot(userAgent: string | undefined): boolean {
   if (!userAgent) return true;
   return /bot|crawler|spider|scraper|curl|wget|python|java|php|facebook|externalhit|slurp|yahoo/i.test(userAgent);
 }
+
+/** Platform type for redirect logic */
+export type Platform = 'ios' | 'android' | 'desktop';
+
+/** iOS detection patterns */
+const IOS_PATTERNS = [/iPhone/i, /iPad/i, /iPod/i];
+
+/** Android detection patterns */
+const ANDROID_PATTERNS = [/Android/i];
+
+/**
+ * Detect platform for redirect logic
+ * - iOS: Direct redirect works well
+ * - Android: Needs shim page for in-app browsers
+ * - Desktop: Direct redirect works well
+ */
+export function detectPlatform(userAgent: string | undefined): Platform {
+  if (!userAgent) {
+    return 'desktop';
+  }
+
+  // Check iOS first (iPhone, iPad, iPod)
+  for (const pattern of IOS_PATTERNS) {
+    if (pattern.test(userAgent)) {
+      return 'ios';
+    }
+  }
+
+  // Check Android
+  for (const pattern of ANDROID_PATTERNS) {
+    if (pattern.test(userAgent)) {
+      return 'android';
+    }
+  }
+
+  // Default to desktop
+  return 'desktop';
+}
