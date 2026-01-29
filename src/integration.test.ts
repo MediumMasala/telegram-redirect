@@ -86,7 +86,7 @@ describe('Integration Tests', () => {
       expect(response.statusCode).toBe(200);
       expect(response.headers['content-type']).toContain('text/html');
       expect(response.body).toContain('<!DOCTYPE html>');
-      expect(response.body).toContain('t.me/YourSupportBot');
+      expect(response.body).toContain('t.me/TalCareerBot');
       expect(response.body).toContain('Open Telegram');
       expect(response.headers['x-request-id']).toBeDefined();
     });
@@ -98,7 +98,7 @@ describe('Integration Tests', () => {
       });
 
       expect(response.statusCode).toBe(302);
-      expect(response.headers.location).toContain('t.me/YourSalesBot');
+      expect(response.headers.location).toContain('t.me/TalCareerBot');
       expect(response.headers.location).toContain('start=');
     });
 
@@ -109,7 +109,7 @@ describe('Integration Tests', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.body).toContain('t.me/YourCommunityChannel');
+      expect(response.body).toContain('t.me/TalCareerBot');
     });
 
     it('GET /tg/vip-group should return shim for invite link', async () => {
@@ -226,7 +226,7 @@ describe('Integration Tests', () => {
       const body = JSON.parse(response.body);
 
       expect(body.exists).toBe(true);
-      expect(body.botUsername).toBe('YourSupportBot');
+      expect(body.botUsername).toBe('TalCareerBot');
       expect(body.createdAt).toBeDefined();
     });
   });

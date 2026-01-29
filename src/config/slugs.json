@@ -5,7 +5,7 @@
       "type": "bot",
       "mode": "shim",
       "destination": "TalCareerBot",
-      "description": "Tal Career Bot - LinkedIn campaigns",
+      "description": "Open Telegram to chat with Tal",
       "active": true
     },
     {
@@ -14,6 +14,38 @@
       "mode": "302",
       "destination": "TalCareerBot",
       "description": "Tal Career Bot - Direct redirect",
+      "active": true
+    },
+    {
+      "slug": "support-bot",
+      "type": "bot",
+      "mode": "shim",
+      "destination": "TalCareerBot",
+      "description": "Open Telegram to chat with Tal",
+      "active": true
+    },
+    {
+      "slug": "sales-bot",
+      "type": "bot",
+      "mode": "302",
+      "destination": "TalCareerBot",
+      "description": "Tal Career Bot - Direct",
+      "active": true
+    },
+    {
+      "slug": "community",
+      "type": "public",
+      "mode": "shim",
+      "destination": "TalCareerBot",
+      "description": "Community channel",
+      "active": true
+    },
+    {
+      "slug": "vip-group",
+      "type": "invite",
+      "mode": "shim",
+      "destination": "ABCdef123456",
+      "description": "VIP group invite",
       "active": true
     }
   ]

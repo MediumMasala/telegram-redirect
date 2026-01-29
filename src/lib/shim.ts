@@ -1,10 +1,6 @@
 /**
  * HTML shim page generator for Telegram deep linking
- *
- * The shim page:
- * 1. Attempts to open the Telegram app using tg:// protocol
- * 2. Falls back to https://t.me/ after a delay
- * 3. Shows a manual button as a backup
+ * Design based on WhatsApp bridge landing page
  */
 
 import type { TelegramDestinationType } from '../types.js';
@@ -17,18 +13,6 @@ function escapeHtml(str: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
-}
-
-/** Generate OG meta tags for link previews */
-function generateOgTags(title: string, description: string): string {
-  return `
-    <meta property="og:title" content="${escapeHtml(title)}" />
-    <meta property="og:description" content="${escapeHtml(description)}" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="${escapeHtml(title)}" />
-    <meta name="twitter:description" content="${escapeHtml(description)}" />
-  `;
 }
 
 interface ShimOptions {
@@ -52,15 +36,12 @@ interface ShimOptions {
 function buildDeepLink(type: TelegramDestinationType, destination: string, startParam?: string): string {
   switch (type) {
     case 'bot':
-      // tg://resolve?domain=BotUsername&start=payload
       return startParam
         ? `tg://resolve?domain=${encodeURIComponent(destination)}&start=${encodeURIComponent(startParam)}`
         : `tg://resolve?domain=${encodeURIComponent(destination)}`;
     case 'public':
-      // tg://resolve?domain=username
       return `tg://resolve?domain=${encodeURIComponent(destination)}`;
     case 'invite':
-      // tg://join?invite=hash
       return `tg://join?invite=${encodeURIComponent(destination)}`;
   }
 }
@@ -89,163 +70,151 @@ export function generateShimHtml(options: ShimOptions): string {
     type,
     destination,
     startParam,
-    title = 'Opening Telegram...',
-    description = 'Redirecting you to Telegram',
-    fallbackDelay = 1000,
+    title = 'Open Telegram to chat with Tal',
+    description = 'Tap the button below to start a conversation',
+    fallbackDelay = 800,
   } = options;
 
   const deepLink = buildDeepLink(type, destination, startParam);
   const fallbackUrl = buildFallbackUrl(type, destination, startParam);
-  const escapedFallbackUrl = escapeHtml(fallbackUrl);
-  const escapedDeepLink = escapeHtml(deepLink);
+  const safeDeepLink = escapeHtml(deepLink);
+  const safeFallbackUrl = escapeHtml(fallbackUrl);
+  const safeTitle = escapeHtml(title);
+  const safeDescription = escapeHtml(description);
+  const safeCode = startParam ? escapeHtml(startParam) : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>${escapeHtml(title)}</title>
-  ${generateOgTags(title, description)}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow">
+  <title>${safeTitle}</title>
+  <meta property="og:title" content="${safeTitle}" />
+  <meta property="og:description" content="${safeDescription}" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       background: linear-gradient(135deg, #0088cc 0%, #0077b5 100%);
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 20px;
+      color: #fff;
     }
     .container {
-      background: white;
+      background: #fff;
       border-radius: 16px;
-      padding: 40px;
-      text-align: center;
+      padding: 32px 24px;
       max-width: 400px;
       width: 100%;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     }
-    .logo {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 24px;
-    }
-    h1 {
-      font-size: 24px;
-      color: #1a1a1a;
-      margin-bottom: 12px;
-    }
-    p {
-      color: #666;
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #e0e0e0;
-      border-top-color: #0088cc;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 24px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .btn {
-      display: inline-block;
+    .logo { width: 80px; height: 80px; margin-bottom: 20px; }
+    h1 { color: #1a1a1a; font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+    .subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
+    .cta-button {
+      display: block;
+      width: 100%;
       background: #0088cc;
-      color: white;
-      padding: 14px 32px;
-      border-radius: 8px;
-      text-decoration: none;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 24px;
+      font-size: 18px;
       font-weight: 600;
-      font-size: 16px;
-      transition: background 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
     }
-    .btn:hover {
-      background: #006699;
-    }
-    .fallback {
-      margin-top: 16px;
-      font-size: 14px;
-      color: #888;
-    }
-    .fallback a {
-      color: #0088cc;
-    }
-    .hidden {
+    .cta-button:hover { background: #006699; }
+    .cta-button:active { transform: scale(0.98); }
+    .fallback { margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee; }
+    .fallback-link { color: #666; font-size: 13px; text-decoration: underline; cursor: pointer; }
+    .fallback-instructions {
       display: none;
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+      text-align: left;
+      font-size: 13px;
+      color: #666;
+    }
+    .fallback-instructions.show { display: block; }
+    .fallback-instructions ol { margin-left: 18px; }
+    .fallback-instructions li { margin-bottom: 6px; }
+    .ref-tag { color: #aaa; font-size: 10px; margin-top: 16px; }
+    @media (max-width: 380px) {
+      .container { padding: 24px 16px; }
+      h1 { font-size: 20px; }
+      .cta-button { font-size: 16px; padding: 14px 20px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <svg class="logo" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="120" cy="120" r="120" fill="#0088cc"/>
-      <path d="M98 175c-3.9 0-3.2-1.5-4.6-5.2L82 132.2 176 72" fill="#c8daea"/>
-      <path d="M98 175c3 0 4.3-1.4 6-3l16-15.6-20-12" fill="#a9c9dd"/>
-      <path d="M100 144.4l48.4 35.7c5.5 3 9.5 1.5 10.9-5.1l19.7-93c2-8-3-11.6-8.4-9.2L52 107.5c-7.8 3.1-7.7 7.5-1.4 9.5l36.4 11.4 84.4-53.2c4-2.4 7.6-.8 4.6 1.5" fill="#fff"/>
+    <svg class="logo" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="40" fill="#0088cc"/>
+      <path d="M55.8 24.2L22.1 37.5c-2.3.9-2.3 2.2-.4 2.8l8.6 2.7 3.3 10.1c.4 1.1.8 1.5 1.6 1.5.8 0 1.2-.4 1.7-.8l4.1-4 8.5 6.3c1.6.9 2.7.4 3.1-1.5l5.6-26.4c.5-2.1-.8-3-2.4-2.4zM50.5 31.5L34.3 45.1c-.2.1-.3.3-.3.5l-.9 5.4c0 .2-.3.2-.4 0l-2.4-7.3c-.1-.2 0-.4.2-.5l19.5-12.1c.3-.2.5.1.3.4z" fill="white"/>
     </svg>
-    <div class="spinner" id="spinner"></div>
-    <h1>${escapeHtml(title)}</h1>
-    <p>We're opening Telegram for you. If it doesn't open automatically, tap the button below.</p>
-    <a href="${escapedFallbackUrl}" class="btn" id="openBtn">Open Telegram</a>
-    <p class="fallback">
-      Having trouble? <a href="${escapedFallbackUrl}">Click here</a>
-    </p>
+    <h1>${safeTitle}</h1>
+    <p class="subtitle">${safeDescription}</p>
+    <button id="cta" class="cta-button">Continue to Telegram</button>
+    <div class="fallback">
+      <a id="fallbackToggle" class="fallback-link">Having trouble? Tap here for help</a>
+      <div id="fallbackInstructions" class="fallback-instructions">
+        <p><strong>If Telegram doesn't open:</strong></p>
+        <ol>
+          <li>Tap the <strong>•••</strong> menu in the top right corner</li>
+          <li>Select "<strong>Open in browser</strong>" or "<strong>Open in Safari/Chrome</strong>"</li>
+          <li>Then tap "Continue to Telegram" again</li>
+        </ol>
+        <p style="margin-top: 10px;">Or <a href="${safeFallbackUrl}" target="_blank" rel="noopener" style="color: #0088cc;">open Telegram directly</a></p>
+      </div>
+    </div>
+    ${safeCode ? `<div class="ref-tag">ref: ${safeCode.slice(0, 12)}...</div>` : ''}
   </div>
   <script>
     (function() {
-      var deepLink = '${escapedDeepLink.replace(/'/g, "\\'")}';
-      var fallbackUrl = '${escapedFallbackUrl.replace(/'/g, "\\'")}';
+      var tgDeepLink = "${safeDeepLink.replace(/"/g, '\\"')}";
+      var tgHttps = "${safeFallbackUrl.replace(/"/g, '\\"')}";
       var fallbackDelay = ${fallbackDelay};
-      var fallbackTimer;
-      var hasRedirected = false;
+      var ctaBtn = document.getElementById('cta');
+      var fallbackToggle = document.getElementById('fallbackToggle');
+      var fallbackInstructions = document.getElementById('fallbackInstructions');
 
-      function redirect() {
-        if (hasRedirected) return;
-        hasRedirected = true;
-        window.location.href = fallbackUrl;
-      }
-
-      // Try deep link
-      function tryDeepLink() {
-        // Create hidden iframe to try tg:// link (less intrusive)
-        var iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = deepLink;
-        document.body.appendChild(iframe);
-
-        // Also try direct navigation for some browsers
+      ctaBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = tgDeepLink;
         setTimeout(function() {
-          window.location.href = deepLink;
-        }, 100);
+          window.location.href = tgHttps;
+        }, fallbackDelay);
+      });
 
-        // Set up fallback
-        fallbackTimer = setTimeout(redirect, fallbackDelay);
+      fallbackToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        fallbackInstructions.classList.toggle('show');
+      });
+
+      // Auto-trigger on page load for mobile
+      var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        setTimeout(function() {
+          window.location.href = tgDeepLink;
+          setTimeout(function() {
+            window.location.href = tgHttps;
+          }, fallbackDelay);
+        }, 300);
       }
-
-      // Cancel fallback if page becomes hidden (app opened)
-      document.addEventListener('visibilitychange', function() {
-        if (document.hidden) {
-          clearTimeout(fallbackTimer);
-        }
-      });
-
-      // Also detect blur (app switch)
-      window.addEventListener('blur', function() {
-        clearTimeout(fallbackTimer);
-      });
-
-      // Start the process
-      tryDeepLink();
     })();
   </script>
 </body>

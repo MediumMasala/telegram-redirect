@@ -16,10 +16,9 @@ describe('shim', () => {
 
       expect(html).toContain('<!DOCTYPE html>');
       expect(html).toContain('https://t.me/TestBot?start=abc123');
-      // The & in the deep link is HTML-escaped to &amp; in the script
       expect(html).toContain('tg://resolve?domain=TestBot');
       expect(html).toContain('start=abc123');
-      expect(html).toContain('Open Telegram');
+      expect(html).toContain('Continue to Telegram');
     });
 
     it('should generate HTML for public channel', () => {
@@ -88,6 +87,27 @@ describe('shim', () => {
       });
 
       expect(html).toContain('fallbackDelay = 1500');
+    });
+
+    it('should include fallback instructions', () => {
+      const html = generateShimHtml({
+        type: 'bot',
+        destination: 'TestBot',
+      });
+
+      expect(html).toContain('Having trouble?');
+      expect(html).toContain('Open in browser');
+      expect(html).toContain('fallbackInstructions');
+    });
+
+    it('should include ref tag when startParam is provided', () => {
+      const html = generateShimHtml({
+        type: 'bot',
+        destination: 'TestBot',
+        startParam: 'abc123456789xyz',
+      });
+
+      expect(html).toContain('ref: abc123456789');
     });
   });
 
