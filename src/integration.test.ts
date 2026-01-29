@@ -153,7 +153,7 @@ describe('Integration Tests', () => {
       expect(response.statusCode).toBe(200);
 
       // With defaultStartParam configured, the URL should contain hi_tal_count_me_in
-      expect(response.body).toContain('start=Hytale_County');
+      expect(response.body).toContain('start=Hi_Tal_count_me_in');
     });
 
     it('should not return inactive slug', async () => {
@@ -225,7 +225,7 @@ describe('Integration Tests', () => {
       // Verify the response HTML doesn't contain unescaped dangerous params
       expect(response.body).not.toContain('onclick=alert');
       // Should contain the safe defaultStartParam
-      expect(response.body).toContain('start=Hytale_County');
+      expect(response.body).toContain('start=Hi_Tal_count_me_in');
     });
 
     it('should return request ID header', async () => {
