@@ -81,7 +81,6 @@ export function generateShimHtml(options: ShimOptions): string {
   const safeFallbackUrl = escapeHtml(fallbackUrl);
   const safeTitle = escapeHtml(title);
   const safeDescription = escapeHtml(description);
-  const safeCode = startParam ? escapeHtml(startParam) : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
