@@ -1,44 +1,20 @@
 {
   "slugs": [
     {
-      "slug": "support-bot",
+      "slug": "career",
       "type": "bot",
       "mode": "shim",
-      "destination": "YourSupportBot",
-      "description": "Main support bot - LinkedIn campaign Q1",
+      "destination": "TalCareerBot",
+      "description": "Tal Career Bot - LinkedIn campaigns",
       "active": true
     },
     {
-      "slug": "sales-bot",
+      "slug": "career-direct",
       "type": "bot",
       "mode": "302",
-      "destination": "YourSalesBot",
-      "description": "Sales inquiry bot - direct redirect",
+      "destination": "TalCareerBot",
+      "description": "Tal Career Bot - Direct redirect",
       "active": true
-    },
-    {
-      "slug": "community",
-      "type": "public",
-      "mode": "shim",
-      "destination": "YourCommunityChannel",
-      "description": "Public community channel",
-      "active": true
-    },
-    {
-      "slug": "vip-group",
-      "type": "invite",
-      "mode": "shim",
-      "destination": "ABCdef123456",
-      "description": "VIP private group invite link",
-      "active": true
-    },
-    {
-      "slug": "demo-bot",
-      "type": "bot",
-      "mode": "shim",
-      "destination": "DemoBot",
-      "description": "Demo bot for testing - disabled",
-      "active": false
     }
   ]
 }
