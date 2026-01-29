@@ -27,6 +27,12 @@ export interface SlugConfig {
   description?: string;
   /** Whether this slug is active */
   active: boolean;
+  /**
+   * Default start parameter for bot type (pre-filled message).
+   * If set, this will be used instead of attribution code.
+   * Max 64 characters for Telegram.
+   */
+  defaultStartParam?: string;
 }
 
 /** Complete slugs configuration file structure */

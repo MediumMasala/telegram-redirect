@@ -84,43 +84,53 @@ export async function tgRoutes(
 
     let redirectTarget: string;
     let code: string | undefined;
+    let startParam: string | undefined;
 
     // Handle based on destination type
     if (slugConfig.type === 'bot') {
-      // Generate a code for attribution tracking
-      code = generateCode();
+      // Check if slug has a default start param (pre-filled message)
+      if (slugConfig.defaultStartParam) {
+        // Use the pre-configured start parameter
+        startParam = slugConfig.defaultStartParam;
+        request.log.info({ slug, requestId, startParam }, 'Using default start param');
+      } else {
+        // Generate a code for attribution tracking
+        code = generateCode();
 
-      // Build attribution data
-      const attribution: ClickAttribution = {
-        slug,
-        timestamp,
-        utm: utmParams,
-        extraParams,
-        ipHash,
-        userAgent,
-        device,
-        requestId,
-      };
+        // Build attribution data
+        const attribution: ClickAttribution = {
+          slug,
+          timestamp,
+          utm: utmParams,
+          extraParams,
+          ipHash,
+          userAgent,
+          device,
+          requestId,
+        };
 
-      // Store the code mapping
-      const mapping: CodeMapping = {
-        code,
-        attribution,
-        botUsername: slugConfig.destination,
-        createdAt: timestamp,
-        resolved: false,
-      };
+        // Store the code mapping
+        const mapping: CodeMapping = {
+          code,
+          attribution,
+          botUsername: slugConfig.destination,
+          createdAt: timestamp,
+          resolved: false,
+        };
 
-      try {
-        await storage.storeCode(mapping);
-        request.log.info({ slug, requestId, code }, 'Code generated and stored');
-      } catch (err) {
-        request.log.error({ err, slug, requestId }, 'Failed to store code mapping');
-        // Continue anyway - redirect still works, just no attribution
+        try {
+          await storage.storeCode(mapping);
+          request.log.info({ slug, requestId, code }, 'Code generated and stored');
+        } catch (err) {
+          request.log.error({ err, slug, requestId }, 'Failed to store code mapping');
+          // Continue anyway - redirect still works, just no attribution
+        }
+
+        startParam = code;
       }
 
       // Build redirect target
-      redirectTarget = getDirectRedirectUrl('bot', slugConfig.destination, code);
+      redirectTarget = getDirectRedirectUrl('bot', slugConfig.destination, startParam);
     } else {
       // Public or invite - no code needed
       redirectTarget = getDirectRedirectUrl(slugConfig.type, slugConfig.destination);
@@ -166,7 +176,7 @@ export async function tgRoutes(
       const html = generateShimHtml({
         type: slugConfig.type,
         destination: slugConfig.destination,
-        startParam: code,
+        startParam,
         title: slugConfig.description || 'Opening Telegram...',
         description: 'Click the button below if Telegram doesn\'t open automatically.',
         fallbackDelay: 1000,
