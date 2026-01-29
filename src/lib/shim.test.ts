@@ -89,25 +89,26 @@ describe('shim', () => {
       expect(html).toContain('fallbackDelay = 1500');
     });
 
-    it('should include fallback instructions', () => {
+    it('should include animated screenshot with tap instruction', () => {
       const html = generateShimHtml({
         type: 'bot',
         destination: 'TestBot',
       });
 
-      expect(html).toContain('Having trouble?');
-      expect(html).toContain('Open in browser');
-      expect(html).toContain('fallbackInstructions');
+      expect(html).toContain('screenshot-container');
+      expect(html).toContain('scan-line');
+      expect(html).toContain('tap <strong>Open</strong>');
     });
 
-    it('should include ref tag when startParam is provided', () => {
+    it('should include tap cursor animation', () => {
       const html = generateShimHtml({
         type: 'bot',
         destination: 'TestBot',
         startParam: 'abc123456789xyz',
       });
 
-      expect(html).toContain('ref: abc123456789');
+      expect(html).toContain('tap-cursor');
+      expect(html).toContain('retry-highlight');
     });
   });
 
