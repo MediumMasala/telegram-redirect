@@ -3,10 +3,8 @@
   "version": 2,
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "framework": null,
   "functions": {
     "api/index.ts": {
-      "runtime": "@vercel/node@3",
       "maxDuration": 10
     }
   },
@@ -15,8 +13,5 @@
       "source": "/(.*)",
       "destination": "/api"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
